@@ -1,4 +1,5 @@
 import jfw_structs
+import cstruct
 import json
 import glob
 import os
@@ -10,6 +11,25 @@ HAS_LPD     =   (1<<3)
 HAS_VLPD    =   (1<<4)
 HAS_ASYNC   =   (1<<5)
 
+class header(cstruct.CStruct):
+    __byte_order__ = cstruct.LITTLE_ENDIAN
+    __struct__ = """
+        uint8_t sync_char[2];
+        uint16_t len;
+        uint8_t msg_id;
+     """
+    def print_info(self):
+        print("Sync Char:  %s" % "".join([" %d" % x for x in self.sync_char]))
+        print("Len :"+str(self.len))
+        print("Msg Id: "+str(self.msg_id))
+
+class footer(cstruct.CStruct):
+    __byte_order__ = cstruct.LITTLE_ENDIAN
+    __struct__ = """
+        uint8_t checksum[2];
+     """
+    def print_info(self):
+        print("Checksum:  %s" % "".join([" %d" % x for x in self.checksum]))
 
 def calcultate_checksum(data, len):
     ck_a    =   0
@@ -100,7 +120,7 @@ class serializer():
                 "imu" : imu 
                 }
                 temp_json['vhpd'] = vhpd_json
-                # temp_json = {"vhpd": vhpd_json}
+
             if(msg_id & (HAS_HPD)):
                 hpd = jfw_structs.highPriorityData()
                 hpd_data = data[off:(off+hpd.size)]
@@ -116,7 +136,6 @@ class serializer():
                         "throttle":hpd.throttle
                 }
                 temp_json['hpd'] = hpd_json
-                # temp_json = {"vhpd": vhpd_json, "hpd":hpd_json}
 
             if(msg_id & (HAS_NPD)):
                 npd = jfw_structs.normalPriorityData()
@@ -138,7 +157,6 @@ class serializer():
                         "brake":npd.brake,
                         "coordinates":coordinates
                 }
-                # temp_json = {"vhpd": vhpd_json, "hpd":hpd_json, "npd":npd_json}
                 temp_json['npd'] = npd_json
                 if(debug):
                     npd.print_info()
@@ -159,7 +177,6 @@ class serializer():
                         "batterySoh":lpd.batterySoh,
                         "vimIcTemp":lpd.vimIcTemp
                 }
-                # temp_json = {"vhpd": vhpd_json, "hpd":hpd_json, "npd":npd_json, "lpd":lpd_json}
                 temp_json['lpd'] = lpd_json
                 if(debug):
                     lpd.print_info()
@@ -176,7 +193,6 @@ class serializer():
                         "batteryPreMosStatus":vlpd.batteryPreMosStatus,
                         "batteryBalancingStatus":vlpd.batteryBalancingStatus
                 }
-                # temp_json = {"vhpd": vhpd_json, "hpd":hpd_json, "npd":npd_json, "lpd":lpd_json, "vlpd":vlpd_json}
                 temp_json['vlpd'] = vlpd_json
                 if(debug):
                     vlpd.print_info()

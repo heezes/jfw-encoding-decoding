@@ -1,25 +1,5 @@
 import cstruct
 
-class header(cstruct.CStruct):
-    __byte_order__ = cstruct.LITTLE_ENDIAN
-    __struct__ = """
-        uint8_t sync_char[2];
-        uint16_t len;
-        uint8_t msg_id;
-     """
-    def print_info(self):
-        print("Sync Char:  %s" % "".join([" %d" % x for x in self.sync_char]))
-        print("Len :"+str(self.len))
-        print("Msg Id: "+str(self.msg_id))
-
-class footer(cstruct.CStruct):
-    __byte_order__ = cstruct.LITTLE_ENDIAN
-    __struct__ = """
-        uint8_t checksum[2];
-     """
-    def print_info(self):
-        print("Checksum:  %s" % "".join([" %d" % x for x in self.checksum]))
-
 class veryHighPriorityData(cstruct.CStruct):
     __byte_order__ = cstruct.LITTLE_ENDIAN
     __struct__ = """
