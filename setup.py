@@ -5,8 +5,8 @@ with open("README.md", "r") as fh:
 
 
 setuptools.setup(
-     name='jfw-encoder-decoder',  
-     version='0.2',
+     name='jfwEncoderDecoder',  
+     version='0.2.2',
      author="Altamash Abdul Rahim",
      author_email="altamash.ar96@gmail.com",
      description="Binary encoding/decoding package",

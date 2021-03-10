@@ -1,5 +1,6 @@
 from pyclibrary import CParser
 import sys
+import pathlib
 
 
 def generateClass(struct_name, name, data):
@@ -56,8 +57,8 @@ if(len(sys.argv) > 1):
         print(struct_data[i])
         print("\n")
     print(member_name)
-
-    filename = "jfw_structs.py"
+    path = pathlib.Path(__file__).parent.absolute()
+    filename = str(path)+"\\jfw_structs.py"
     with open(filename, "w+") as f:
         f.write("import cstruct\n")
         for i in range(0,len(d_structs)):

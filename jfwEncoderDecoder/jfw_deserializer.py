@@ -1,4 +1,4 @@
-import jfw_structs
+from jfwEncoderDecoder import jfw_structs
 import cstruct
 import json
 import glob
@@ -42,7 +42,7 @@ def calcultate_checksum(data, len):
     return ck_a, ck_b
 
 
-class serializer():
+class deserializer():
     def __init__(self, buf, len):
         self.buf = buf
         self.max_size = len

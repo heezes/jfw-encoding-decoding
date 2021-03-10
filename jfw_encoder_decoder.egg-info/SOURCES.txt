@@ -1,7 +1,0 @@
-README.md
-setup.py
-jfw_encoder_decoder.egg-info/PKG-INFO
-jfw_encoder_decoder.egg-info/SOURCES.txt
-jfw_encoder_decoder.egg-info/dependency_links.txt
-jfw_encoder_decoder.egg-info/requires.txt
-jfw_encoder_decoder.egg-info/top_level.txt
