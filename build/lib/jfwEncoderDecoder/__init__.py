@@ -1,7 +1,10 @@
 # __init__.py
-from .jfw_generator import *
-from .jfw_structs import *
-from .jfw_deserializer import deserializer
+try:
+    from .jfw_generator import *
+    from .jfw_structs import *
+    from .jfw_deserializer import deserializer
+except ModuleNotFoundError as err:
+    print(err)
 
 # Version of the jfw-encoder-decoder package
-__version__ = "1.1.2"
+__version__ = "0.2.3"
