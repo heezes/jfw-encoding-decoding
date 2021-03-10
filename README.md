@@ -14,8 +14,6 @@ User decides the data format by providing a header file. The user can insert dat
 
 The structure names are to help user sort data members when using this sdk for data logging purpose.
 
-- Type some Markdown on the left
-- See HTML in the right
 - ✨Magic ✨
 
 ## Packet Structure
