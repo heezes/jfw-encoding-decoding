@@ -106,7 +106,7 @@ class serializer():
                 return
             off += 5
             if(msg_id & (HAS_VHPD)):
-                vhpd = jfw_structs.veryHighPriorityData()
+                vhpd = jfw_structs.veryHighPriorityData_t()
                 vhpd_data = data[off:(off+vhpd.size)]
                 off += vhpd.size
                 vhpd.unpack(vhpd_data)
@@ -115,103 +115,109 @@ class serializer():
                     imu.append(vhpd.imuAxes[i])
                 if(debug):
                     vhpd.print_info()
-                vhpd_json = {
-                "epoch": vhpd.epoch,
-                "imu" : imu 
-                }
-                temp_json['vhpd'] = vhpd_json
+                # vhpd_json = {
+                # "epoch": vhpd.epoch,
+                # "imu" : imu 
+                # }
+                # temp_json['vhpd'] = vhpd_json
+                temp_json['vhpd'] = vhpd.get_dict()
 
             if(msg_id & (HAS_HPD)):
-                hpd = jfw_structs.highPriorityData()
+                hpd = jfw_structs.highPriorityData_t()
                 hpd_data = data[off:(off+hpd.size)]
                 off += hpd.size
                 hpd.unpack(hpd_data)
                 if(debug):
                     hpd.print_info()
-                hpd_json = {
-                        "rpm":hpd.rpm,
-                        "batteryShuntCurrent":hpd.batteryShuntCurrent,
-                        "batteryG3Timestamp":hpd.batteryG3Timestamp,
-                        "buckCurrent":hpd.buckCurrent,
-                        "throttle":hpd.throttle
-                }
-                temp_json['hpd'] = hpd_json
+                # hpd_json = {
+                #         "rpm":hpd.rpm,
+                #         "batteryShuntCurrent":hpd.batteryShuntCurrent,
+                #         "batteryG3Timestamp":hpd.batteryG3Timestamp,
+                #         "buckCurrent":hpd.buckCurrent,
+                #         "throttle":hpd.throttle
+                # }
+                # temp_json['hpd'] = hpd_json
+                temp_json['hpd'] = hpd.get_dict()
 
             if(msg_id & (HAS_NPD)):
-                npd = jfw_structs.normalPriorityData()
+                npd = jfw_structs.normalPriorityData_t()
                 npd_data = data[off:(off+npd.size)]
                 off += npd.size
                 npd.unpack(npd_data)
-                thermistor = []
-                coordinates = []
-                for i in range(0,7):
-                    thermistor.append(npd.batteryThermistorTemp[i])
-                for i in range(0,2):
-                    coordinates.append(npd.coordinates[i])
-                npd_json = {
-                        "batteryG2Timestamp":npd.batteryG2Timestamp,
-                        "batteryThermistorTemp":thermistor,
-                        "batteryIcTemp":npd.batteryIcTemp,
-                        "batteryMosfetTemp":npd.batteryMosfetTemp,
-                        "distance":npd.distance,
-                        "brake":npd.brake,
-                        "coordinates":coordinates
-                }
-                temp_json['npd'] = npd_json
                 if(debug):
                     npd.print_info()
+                # thermistor = []
+                # coordinates = []
+                # for i in range(0,7):
+                #     thermistor.append(npd.batteryThermistorTemp[i])
+                # for i in range(0,2):
+                #     coordinates.append(npd.coordinates[i])
+                # npd_json = {
+                #         "batteryG2Timestamp":npd.batteryG2Timestamp,
+                #         "batteryThermistorTemp":thermistor,
+                #         "batteryIcTemp":npd.batteryIcTemp,
+                #         "batteryMosfetTemp":npd.batteryMosfetTemp,
+                #         "distance":npd.distance,
+                #         "brake":npd.brake,
+                #         "coordinates":coordinates
+                # }
+                # temp_json['npd'] = npd_json
+                temp_json['npd'] = npd.get_dict()
 
             if(msg_id & (HAS_LPD)):
-                lpd = jfw_structs.lowPriorityData()
+                lpd = jfw_structs.lowPriorityData_t()
                 lpd_data = data[off:(off+lpd.size)]
                 off += lpd.size
                 lpd.unpack(lpd_data)
+                if(debug):
+                    lpd.print_info()
                 # CellVoltage = []
                 # for i in range(0,15):
                 # CellVoltage.append(lpd.batteryCellVoltages)
-                lpd_json = {
-                        "batteryG1Timestamp":lpd.batteryG1Timestamp,
-                        "batteryCellVoltages":lpd.batteryCellVoltages,
-                        "batteryStackVoltage":lpd.batteryStackVoltage,
-                        "batterySoc":lpd.batterySoc,
-                        "batterySoh":lpd.batterySoh,
-                        "vimIcTemp":lpd.vimIcTemp
-                }
-                temp_json['lpd'] = lpd_json
-                if(debug):
-                    lpd.print_info()
+                # lpd_json = {
+                #         "batteryG1Timestamp":lpd.batteryG1Timestamp,
+                #         "batteryCellVoltages":lpd.batteryCellVoltages,
+                #         "batteryStackVoltage":lpd.batteryStackVoltage,
+                #         "batterySoc":lpd.batterySoc,
+                #         "batterySoh":lpd.batterySoh,
+                #         "vimIcTemp":lpd.vimIcTemp
+                # }
+                # temp_json['lpd'] = lpd_json
+                temp_json['lpd'] = lpd.get_dict()
 
             if(msg_id & (HAS_VLPD)):
-                vlpd = jfw_structs.veryLowPriorityData()
+                vlpd = jfw_structs.veryLowPriorityData_t()
                 vlpd_data = data[off:(off+vlpd.size)]
                 off += vlpd.size
                 vlpd.unpack(vlpd_data)
-                vlpd_json = {
-                        "batteryG4Timestamp":vlpd.batteryG4Timestamp,
-                        "batteryChgMosStatus":vlpd.batteryChgMosStatus,
-                        "batteryDsgMosStatus":vlpd.batteryDsgMosStatus,
-                        "batteryPreMosStatus":vlpd.batteryPreMosStatus,
-                        "batteryBalancingStatus":vlpd.batteryBalancingStatus
-                }
-                temp_json['vlpd'] = vlpd_json
                 if(debug):
                     vlpd.print_info()
+                # vlpd_json = {
+                #         "batteryG4Timestamp":vlpd.batteryG4Timestamp,
+                #         "batteryChgMosStatus":vlpd.batteryChgMosStatus,
+                #         "batteryDsgMosStatus":vlpd.batteryDsgMosStatus,
+                #         "batteryPreMosStatus":vlpd.batteryPreMosStatus,
+                #         "batteryBalancingStatus":vlpd.batteryBalancingStatus
+                # }
+                # temp_json['vlpd'] = vlpd_json
+                temp_json['vlpd'] = vlpd.get_dict()
 
             if(msg_id & (HAS_ASYNC)):
-                ASYNC = jfw_structs.asyncData()
+                ASYNC = jfw_structs.asyncData_t()
                 off = (max_size-self.len)
                 ASYNC_data = data[off:(off+ASYNC.size)]
                 ASYNC.unpack(ASYNC_data)
-                id = ""
-                id.join(["%c" % x for x in ASYNC.batteryId])
-                async_json = {
-                    "timestamp":ASYNC.timestamp,
-                    "fault":ASYNC.fault,
-                    "batteryId":id
-                }
-                temp_json['async'] = async_json
                 if(debug):
                     ASYNC.print_info()
+                # id = ""
+                # id.join(["%c" % x for x in ASYNC.batteryId])
+                # async_json = {
+                #     "timestamp":ASYNC.timestamp,
+                #     "fault":ASYNC.fault,
+                #     "batteryId":id
+                # }
+                # temp_json['async'] = async_json
+                temp_json['async'] = ASYNC.get_dict() 
 
             self.decoded_data += (packet_len+7)
 
