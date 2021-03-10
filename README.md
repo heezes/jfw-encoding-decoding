@@ -50,7 +50,7 @@ SDK requires [Python] 3.6+ to run.
 Install the package.
 
 ```sh
-pip install jfwEncoderDecoder
+pip3 install jfwEncoderDecoder
 ```
 
 Generate the strcture class from conf header file
