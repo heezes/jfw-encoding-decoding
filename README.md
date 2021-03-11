@@ -61,6 +61,7 @@ Now the class file has been generated and user can start using the sdk
 
 ## Usage
 
+Decoding
 ```sh
 import json
 import jfwEncoderDecoder.jfw_deserializer as jfw
@@ -76,6 +77,25 @@ with open(binaryFilePath, "rb") as f:
          if(final_json != None):
              temp.append(json.loads(final_json))
  print("Data Lost: "+ser.loss())
+```
+
+Encoding/Decoding
+```sh
+with open('file.json', "rb+") as f:
+    lines = f.readlines()
+    idx = 0
+    for line in lines:
+        idx += 1
+        final_dictionary = json.loads(line)
+        encoder = jfwEncoderDecoder.jfw_serializer.serializer(final_dictionary, len(final_dictionary))
+        pkt_data = encoder.encode()
+        decoder = jfwEncoderDecoder.jfw_deserializer.deserializer(pkt_data, len(pkt_data))
+        decoder.search()
+        ret_json = decoder.decode()
+        if(json.dumps(final_dictionary) == str(ret_json)):
+            print("Line "+str(idx)+": Encoding/Decoding Successful!")
+        else:
+            print("ERROR!!!!!!")
 ```
 
 ## Development
