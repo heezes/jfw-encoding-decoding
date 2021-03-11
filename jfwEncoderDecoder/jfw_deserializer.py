@@ -125,7 +125,6 @@ class deserializer():
                 temp_json['async'] = ASYNC.get_dict() 
 
             self.decoded_data += (packet_len+7)
-
             return json.dumps(temp_json)
         except:
             return None

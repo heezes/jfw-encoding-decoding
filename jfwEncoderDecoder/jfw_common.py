@@ -39,6 +39,13 @@ class header(cstruct.CStruct):
         print("Sync Char:  %s" % "".join([" %d" % x for x in self.sync_char]))
         print("Len :"+str(self.len))
         print("Msg Id: "+str(self.msg_id))
+    
+    def get_binary(self, json_data):
+        for i in range(0,2):
+            self.sync_char[i] = json_data['sync_char'][i]
+        self.len = json_data['len']
+        self.msg_id = json_data['msg_id']
+
 
 class footer(cstruct.CStruct):
     __byte_order__ = cstruct.LITTLE_ENDIAN
@@ -47,3 +54,7 @@ class footer(cstruct.CStruct):
      """
     def print_info(self):
         print("Checksum:  %s" % "".join([" %d" % x for x in self.checksum]))
+
+    def get_binary(self, data):
+        for i in range(0, 2):
+            self.checksum[i] = data[i]

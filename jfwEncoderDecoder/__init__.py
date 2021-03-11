@@ -3,6 +3,7 @@ try:
     from .jfw_generator import *
     from .jfw_structs import *
     from .jfw_deserializer import deserializer
+    from .jfw_serializer import serializer
 except ModuleNotFoundError as err:
     print(err)
 
