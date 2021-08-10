@@ -8,4 +8,4 @@ except ModuleNotFoundError as err:
     print(err)
 
 # Version of the jfw-encoder-decoder package
-__version__ = "0.2.4"
+__version__ = "0.2.5"

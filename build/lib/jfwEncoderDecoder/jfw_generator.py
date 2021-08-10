@@ -17,7 +17,13 @@ def generateClass(struct_name, name, data):
     temp_members    +=  "        m_json = {}\n"
     for i in range(0, len(name)):
         temp_members    +=  "        m_json['{}'] = self.{}\n".format(data[i], data[i])
-    temp_members    +=  "        return m_json"
+    class_str       +=  temp_members+"        return m_json\n"
+    '''
+    Generate binary function
+    '''
+    temp_members    =   "\n    def get_binary(self, json_data):\n"
+    for i in range(0, len(name)):
+        temp_members    +=  "        self.{} = json_data['{}']\n".format(data[i], data[i])
     return class_str+temp_members
 
 def main():

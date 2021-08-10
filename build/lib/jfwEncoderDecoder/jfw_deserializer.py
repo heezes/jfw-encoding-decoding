@@ -1,46 +1,7 @@
 from jfwEncoderDecoder import jfw_structs
+from jfwEncoderDecoder import jfw_common
 import cstruct
 import json
-import glob
-import os
-
-HAS_VHPD    =   (1<<0)
-HAS_HPD     =   (1<<1)
-HAS_NPD     =   (1<<2)
-HAS_LPD     =   (1<<3)
-HAS_VLPD    =   (1<<4)
-HAS_ASYNC   =   (1<<5)
-
-class header(cstruct.CStruct):
-    __byte_order__ = cstruct.LITTLE_ENDIAN
-    __struct__ = """
-        uint8_t sync_char[2];
-        uint16_t len;
-        uint8_t msg_id;
-     """
-    def print_info(self):
-        print("Sync Char:  %s" % "".join([" %d" % x for x in self.sync_char]))
-        print("Len :"+str(self.len))
-        print("Msg Id: "+str(self.msg_id))
-
-class footer(cstruct.CStruct):
-    __byte_order__ = cstruct.LITTLE_ENDIAN
-    __struct__ = """
-        uint8_t checksum[2];
-     """
-    def print_info(self):
-        print("Checksum:  %s" % "".join([" %d" % x for x in self.checksum]))
-
-def calcultate_checksum(data, len):
-    ck_a    =   0
-    ck_b    =   0
-    for i in range(2,len-2):
-        ck_a += data[i]
-        ck_b += ck_a
-    ck_a &= 0xFF
-    ck_b &= 0xFF
-    return ck_a, ck_b
-
 
 class deserializer():
     def __init__(self, buf, len):
@@ -49,6 +10,7 @@ class deserializer():
         self.sync_char_off = []
         self.decode_idx = 0
         self.decoded_data = 0
+        self.common = jfw_common.jfw()
         
     def search(self):
         ret = False
@@ -81,17 +43,17 @@ class deserializer():
             self.decode_idx += 1
             temp_json = {}
             packet_len = 0     
-            msg_header  =   header()
+            msg_header  =   jfw_common.header()
             header_data =   data[off:(off+5)]
             msg_header.unpack(header_data)
             packet_len  = msg_header.len
             msg_id      = msg_header.msg_id
-            msg_footer  = footer()
+            msg_footer  = jfw_common.footer()
             chcksum_offset = off+packet_len+5
             footer_data = data[(chcksum_offset): (chcksum_offset+2)]
             msg_footer.unpack(footer_data)
             packet      = data[off:(chcksum_offset+2)] #Checksum function takes the complete Frame as Input
-            ck          = calcultate_checksum(packet, packet_len+7) #The Checksum function internally offsets and trims the header and footer
+            ck          = jfw_common.calcultate_checksum(packet, packet_len+7) #The Checksum function internally offsets and trims the header and footer
             
             
             if(ck[0] != msg_footer.checksum[0] or ck[1] != msg_footer.checksum[1]):
@@ -105,7 +67,7 @@ class deserializer():
                     msg_footer.print_info()
                 return
             off += 5
-            if(msg_id & (HAS_VHPD)):
+            if(msg_id & (self.common.vhpd_mask)):
                 vhpd = jfw_structs.veryHighPriorityData_t()
                 vhpd_data = data[off:(off+vhpd.size)]
                 off += vhpd.size
@@ -115,112 +77,53 @@ class deserializer():
                     imu.append(vhpd.imuAxes[i])
                 if(debug):
                     vhpd.print_info()
-                # vhpd_json = {
-                # "epoch": vhpd.epoch,
-                # "imu" : imu 
-                # }
-                # temp_json['vhpd'] = vhpd_json
                 temp_json['vhpd'] = vhpd.get_dict()
 
-            if(msg_id & (HAS_HPD)):
+            if(msg_id & (self.common.hpd_mask)):
                 hpd = jfw_structs.highPriorityData_t()
                 hpd_data = data[off:(off+hpd.size)]
                 off += hpd.size
                 hpd.unpack(hpd_data)
                 if(debug):
                     hpd.print_info()
-                # hpd_json = {
-                #         "rpm":hpd.rpm,
-                #         "batteryShuntCurrent":hpd.batteryShuntCurrent,
-                #         "batteryG3Timestamp":hpd.batteryG3Timestamp,
-                #         "buckCurrent":hpd.buckCurrent,
-                #         "throttle":hpd.throttle
-                # }
-                # temp_json['hpd'] = hpd_json
                 temp_json['hpd'] = hpd.get_dict()
 
-            if(msg_id & (HAS_NPD)):
+            if(msg_id & (self.common.npd_mask)):
                 npd = jfw_structs.normalPriorityData_t()
                 npd_data = data[off:(off+npd.size)]
                 off += npd.size
                 npd.unpack(npd_data)
                 if(debug):
                     npd.print_info()
-                # thermistor = []
-                # coordinates = []
-                # for i in range(0,7):
-                #     thermistor.append(npd.batteryThermistorTemp[i])
-                # for i in range(0,2):
-                #     coordinates.append(npd.coordinates[i])
-                # npd_json = {
-                #         "batteryG2Timestamp":npd.batteryG2Timestamp,
-                #         "batteryThermistorTemp":thermistor,
-                #         "batteryIcTemp":npd.batteryIcTemp,
-                #         "batteryMosfetTemp":npd.batteryMosfetTemp,
-                #         "distance":npd.distance,
-                #         "brake":npd.brake,
-                #         "coordinates":coordinates
-                # }
-                # temp_json['npd'] = npd_json
                 temp_json['npd'] = npd.get_dict()
 
-            if(msg_id & (HAS_LPD)):
+            if(msg_id & (self.common.lpd_mask)):
                 lpd = jfw_structs.lowPriorityData_t()
                 lpd_data = data[off:(off+lpd.size)]
                 off += lpd.size
                 lpd.unpack(lpd_data)
                 if(debug):
                     lpd.print_info()
-                # CellVoltage = []
-                # for i in range(0,15):
-                # CellVoltage.append(lpd.batteryCellVoltages)
-                # lpd_json = {
-                #         "batteryG1Timestamp":lpd.batteryG1Timestamp,
-                #         "batteryCellVoltages":lpd.batteryCellVoltages,
-                #         "batteryStackVoltage":lpd.batteryStackVoltage,
-                #         "batterySoc":lpd.batterySoc,
-                #         "batterySoh":lpd.batterySoh,
-                #         "vimIcTemp":lpd.vimIcTemp
-                # }
-                # temp_json['lpd'] = lpd_json
                 temp_json['lpd'] = lpd.get_dict()
 
-            if(msg_id & (HAS_VLPD)):
+            if(msg_id & (self.common.vlpd_mask)):
                 vlpd = jfw_structs.veryLowPriorityData_t()
                 vlpd_data = data[off:(off+vlpd.size)]
                 off += vlpd.size
                 vlpd.unpack(vlpd_data)
                 if(debug):
                     vlpd.print_info()
-                # vlpd_json = {
-                #         "batteryG4Timestamp":vlpd.batteryG4Timestamp,
-                #         "batteryChgMosStatus":vlpd.batteryChgMosStatus,
-                #         "batteryDsgMosStatus":vlpd.batteryDsgMosStatus,
-                #         "batteryPreMosStatus":vlpd.batteryPreMosStatus,
-                #         "batteryBalancingStatus":vlpd.batteryBalancingStatus
-                # }
-                # temp_json['vlpd'] = vlpd_json
                 temp_json['vlpd'] = vlpd.get_dict()
 
-            if(msg_id & (HAS_ASYNC)):
+            if(msg_id & (self.common.async_mask)):
                 ASYNC = jfw_structs.asyncData_t()
-                off = (max_size-self.len)
                 ASYNC_data = data[off:(off+ASYNC.size)]
                 ASYNC.unpack(ASYNC_data)
                 if(debug):
                     ASYNC.print_info()
-                # id = ""
-                # id.join(["%c" % x for x in ASYNC.batteryId])
-                # async_json = {
-                #     "timestamp":ASYNC.timestamp,
-                #     "fault":ASYNC.fault,
-                #     "batteryId":id
-                # }
-                # temp_json['async'] = async_json
                 temp_json['async'] = ASYNC.get_dict() 
 
             self.decoded_data += (packet_len+7)
-
             return json.dumps(temp_json)
         except:
             return None

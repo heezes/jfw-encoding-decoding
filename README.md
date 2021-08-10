@@ -19,9 +19,9 @@ The structure names are to help user sort data members when using this sdk for d
 ## Packet Structure
 
 Data is encoded according to the following scheme
-| SYNC_CHAR_1 | SYNC_CHAR_2 | LENGTH | MSG_ID | DATA[LENGTH] | CK_A | CK_B|
-| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
-| 0xB5 | 0x62 | Length | Packet Id | Length bytes of data | [Checksum] | [Checksum] |
+| SYNC_CHAR_1 | SYNC_CHAR_2 | LENGTH | MSG_ID    | DATA[LENGTH] | CK_A       | CK_B       |
+|-------------|-------------|--------|-----------|--------------|------------|------------|
+| 0xB5        | 0x62        | Length | Packet Id | Data Length  | [Checksum] | [Checksum] |
 
 ## Features
 
@@ -62,7 +62,7 @@ Now the class file has been generated and user can start using the sdk
 ## Usage
 
 Decoding
-```sh
+```python
 import json
 import jfwEncoderDecoder.jfw_deserializer as jfw
 
@@ -71,16 +71,18 @@ with open(binaryFilePath, "rb") as f:
      data = f.read()
      ser = jfw.deserializer(data, len(data))
      ser.search()
-     temp = list()
      while(ser.decode_idx < len(ser.sync_char_off)):
          final_json = ser.decode(False)
-         if(final_json != None):
-             temp.append(json.loads(final_json))
+        if(final_json != None):
+            temp = json.loads(final_json)
+            if 'async' in temp:
+                temp['async']['batteryId'] = "".join(chr(i) for i in temp['async']['batteryId'])
  print("Data Lost: "+ser.loss())
 ```
+#### Note: Strings have to be dealt with in post processing
 
 Encoding/Decoding
-```sh
+```python
 with open('file.json', "rb+") as f:
     lines = f.readlines()
     idx = 0

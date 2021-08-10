@@ -117,7 +117,6 @@ class deserializer():
 
             if(msg_id & (self.common.async_mask)):
                 ASYNC = jfw_structs.asyncData_t()
-                off = (max_size-self.len)
                 ASYNC_data = data[off:(off+ASYNC.size)]
                 ASYNC.unpack(ASYNC_data)
                 if(debug):
