@@ -1,5 +1,6 @@
 from pyclibrary import CParser
 import sys
+import os
 import pathlib
 
 
@@ -65,7 +66,7 @@ def main():
             print("\n")
         print(member_name)
         path = pathlib.Path(__file__).parent.absolute()
-        filename = str(path)+"\\jfw_structs.py"
+        filename = os.path.join(str(path),"jfw_structs.py")
         with open(filename, "w+") as f:
             f.write("import cstruct\n")
             for i in range(0,len(d_structs)):
